@@ -38,7 +38,7 @@ convert.offense.code <- function(codes) {
 arrest.offenses <- read.delim('arrest.offenses.tsv', header=FALSE, col.names=c('real.offense','nominal.offense'))
 arrest.offenses$real.offense <- trim(arrest.offenses$real.offense)
 arrest.offenses$nominal.offense <- trim(arrest.offenses$nominal.offense)
-# combine and standardize top 100 reasons for arrest
+# custom function to combine and standardize top 100 reasons for arrest
 convert.arrest.reasons <- function(rawlist) {
   ndx <- match(rawlist, arrest.offenses$nominal.offense)
   responses <- arrest.offenses$real.offense[ndx]
@@ -268,17 +268,19 @@ sqf.data$lon <- coords$x
 # recode suspect.race for "white hispanic" and "black hispanic" to "hispanic"
 levels(sqf.data$suspect.race) <- c("asian", "black", "native.american", "hispanic", "hispanic", "white", "other")
 
-# add weekday, month, and time (6 four-hour-bins denoted by 1 through 6)
-# sqf.data <- sqf.data %>% mutate(day = wday(timestamp, label = T, abbr = F),
-#                                 month = month(timestamp, label = T, abbr = F),
-#                                 time.period = case_when(
-#                                   hour(timestamp) < 4 ~ '1',
-#                                   hour(timestamp) >= 4 & hour(timestamp) < 8 ~ '2',
-#                                   hour(timestamp) >= 8 & hour(timestamp) < 12 ~ '3',
-#                                   hour(timestamp) >= 12 & hour(timestamp) < 16 ~ '4',
-#                                   hour(timestamp) >= 16 & hour(timestamp) < 20 ~ '5',
-#                                   hour(timestamp) >= 20 ~ '6'
-#                                 ))
+# add weekday, month, and time period (6 four-hour-bins denoted by 1 through 6)
+sqf.data <- sqf.data %>% mutate(day = wday(timestamp),
+                                month = month(timestamp),
+                                # day = wday(timestamp, label=T, abbr=F),
+                                # month = month(timestamp, label=T, abbr=F),
+                                time.period = case_when(
+                                  hour(timestamp) < 4 ~ '1',
+                                  hour(timestamp) >= 4 & hour(timestamp) < 8 ~ '2',
+                                  hour(timestamp) >= 8 & hour(timestamp) < 12 ~ '3',
+                                  hour(timestamp) >= 12 & hour(timestamp) < 16 ~ '4',
+                                  hour(timestamp) >= 16 & hour(timestamp) < 20 ~ '5',
+                                  hour(timestamp) >= 20 ~ '6'
+                                ))
 
 # drop remaining irrelevant columns
 sqf.data <- sqf.data %>% select(-crimsusp, -repcmd, -revcmd, -othfeatr, -addrtyp, 

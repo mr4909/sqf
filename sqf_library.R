@@ -11,7 +11,11 @@ requiredPackages = c('plyr',
                      'tidyverse',
                      'lubridate',
                      'ROCR',
-                     'foreach')
+                     'foreach',
+                     'proj4',
+                     'data.table',
+                     'ggplot2',
+                     'readr')
 # only downloads packages if needed
 for(p in requiredPackages){
   if(!require(p,character.only = TRUE)) install.packages(p)
