@@ -7,23 +7,27 @@
 
 source('sqf_library')
 
-library(ggplot2) # plots
-library(dplyr) # easier data wrangling 
-library(viridis) # colour blind friendly palette, works in B&W also
-library(lubridate) # for easy date manipulation
-library(ggExtra) # because remembering ggplot theme options is beyond me
-library(tidyr) 
-library(ggpubr) # plots
+# load necessary plot packages
+requiredPackages = c('viridis',
+                     'ggExtra',
+                     'tidyr',
+                     'ggpubr')
+# only downloads packages if needed
+for(p in requiredPackages){
+  if(!require(p,character.only = TRUE)) install.packages(p)
+  library(p,character.only = TRUE)
+}
 
 
 ###########
 # import
 ###########
 
+# import sqf data created in sqf_import
 sqf.data <- read_csv('sqf_08_16.csv')
 
 ###########
-# clean
+# clean for plotting
 ###########
 
 sqf <- sqf.data %>%
