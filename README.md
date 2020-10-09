@@ -9,7 +9,7 @@ Examine all complete cases of suspicion of a “criminal possession of weapon”
 `sqf_library.R`: Runs packages and custom functions needed in `sqf_import.R`.  
 `sqf_plots.R`: Creates data visualizations.    
 
-`codebooks`: Information on the structure, contents, and layout of files.  
+`codebook.pdf`: Information on the structure, contents, and layout of files.  
 
 # Data
 
