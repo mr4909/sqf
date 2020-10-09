@@ -15,7 +15,7 @@ Examine all complete cases of suspicion of a “criminal possession of weapon”
 
 [SQF Data](https://www1.nyc.gov/site/nypd/stats/reports-analysis/stopfrisk.page)
 
-`arrest.offenses.tsv`: List of arrestable offenses and their digit codes.  
+`arrest.offenses.tsv`: List of arrest reasons and their digit codes.  
 
 `offense-codes.tsv`: List of offenses and their digit codes.   
 
