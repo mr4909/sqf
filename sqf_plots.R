@@ -7,17 +7,14 @@
 
 source('sqf_library')
 
-library(ggplot2) # graphs
+library(ggplot2) # plots
 library(dplyr) # easier data wrangling 
 library(viridis) # colour blind friendly palette, works in B&W also
 library(lubridate) # for easy date manipulation
 library(ggExtra) # because remembering ggplot theme options is beyond me
-library(tidyr)
+library(tidyr) 
+library(ggpubr) # plots
 
-# Install
-if(!require(devtools)) install.packages("devtools")
-devtools::install_github("kassambara/ggpubr")
-library("ggpubr")
 
 ###########
 # import
@@ -55,19 +52,42 @@ sqf <- sqf %>% filter(complete.cases(sqf))
 
 # create stopped because variable
 sqf <- sqf %>% 
-mutate(stopped.bc = case_when((stopped.bc.desc==TRUE) ~ "stopped.bc.desc",
-                              (stopped.bc.violent==TRUE) ~ "stopped.bc.violent",
-                              (stopped.bc.other==TRUE) ~ "stopped.bc.other",
-                              (stopped.bc.object==TRUE) ~ "stopped.bc.object",
-                              (stopped.bc.casing==TRUE) ~ "stopped.bc.casing",
-                              (stopped.bc.lookout==TRUE) ~ "stopped.bc.lookout",
-                              (stopped.bc.drugs==TRUE) ~ "stopped.bc.drugs",
-                              (stopped.bc.clothing==TRUE) ~ "stopped.bc.clothing",
-                              (stopped.bc.bulge==TRUE) ~ "stopped.bc.bulge",
-                              (stopped.bc.furtive==TRUE) ~ "stopped.bc.furtive"))
+mutate(stopped.bc = case_when((stopped.bc.desc==TRUE) ~ "Fits Description",
+                              (stopped.bc.violent==TRUE) ~ "Violence",
+                              (stopped.bc.other==TRUE) ~ "Other",
+                              (stopped.bc.object==TRUE) ~ "Suspicious Object",
+                              (stopped.bc.casing==TRUE) ~ "Casing",
+                              (stopped.bc.lookout==TRUE) ~ "Lookout",
+                              (stopped.bc.drugs==TRUE) ~ "Drug Transaction",
+                              (stopped.bc.clothing==TRUE) ~ "Clothing",
+                              (stopped.bc.bulge==TRUE) ~ "Suspicious Bulge",
+                              (stopped.bc.furtive==TRUE) ~ "Furtive Movements"))
+
+# create additional variable
+sqf <- sqf %>% 
+  mutate(additional = case_when((additional.report==TRUE) ~ "Report from Officer/Other",
+                                (additional.investigation==TRUE) ~ "Ongoing Investigation",
+                                (additional.proximity==TRUE) ~ "Proximity to Scene of Offense",
+                                (additional.evasive==TRUE) ~ "Evasive Responses",
+                                (additional.associating==TRUE) ~ "With Known Criminals",
+                                (additional.highcrime==TRUE) ~ "Area of High Crime",
+                                (additional.direction==TRUE) ~ "Change Direction from Officer",
+                                (additional.time==TRUE) ~ "Time Fits Crime Incidence",
+                                (additional.sights==TRUE) ~ "Sights/Sounds of Crime",
+                                (additional.other==TRUE) ~ "Other"))
+
+# POC vs nonPOC
+sqf <- sqf %>% 
+  mutate(poc = case_when((suspect.race=="black") ~ "BIPOC",
+                         (suspect.race=="white") ~ "White",
+                         (suspect.race=="hispanic") ~ "BIPOC",
+                         (suspect.race=="asian") ~ "BIPOC",
+                         (suspect.race=="native american") ~ "BIPOC",
+                         (suspect.race=="other") ~ "BIPOC"))
+
 
 ###########
-# plot
+# hourly arrests
 ###########
 
 # filter data for heat map plot
@@ -105,36 +125,9 @@ p <- p + theme(legend.position = "bottom")+
          theme(legend.title=element_text(size=8))+
          theme(legend.text=element_text(size=6))+
          removeGrid()#ggExtra
-p
 
 ###########
-# plot
-###########
-
-library(ggridges)
-
-# filter data for heat map plot
-df <- sqf %>% select(year, suspect.age)
-
-# fix variable format for plotting
-df$year <- as.factor(df$year)
-
-ggplot(df, aes(x = suspect.age, y = factor(year), fill = year)) +
-  geom_density_ridges(alpha = 0.8, color = "white") +
-  labs(x = "Suspect Age", y = "Year") +
-  guides(fill = F) +
-  theme_ridges()
-
-###########
-# plot
-###########
-
-df <- sqf %>%
-  group_by(suspect.sex) %>%
-  summarise(count = n())
-
-###########
-# plot
+# stop reason
 ###########
 
 # count stop reasons
@@ -142,23 +135,60 @@ df <- sqf %>%
     group_by(stopped.bc) %>%
     summarise(count = n())
 
-# remove missing data
+# remove NAs
 df <- na.omit(df)
 
-# factor variable
-df$stopped.bc <- factor(df$stopped.bc)
+# for sorting bug in ggbarplot
+df <- df[order(df$count),]
+df$group <- c(1:10)
+df$group <- factor(df$group)
 
-# plot
-ggplot(df, aes(x = reorder(stopped.bc, count), y = count, fill = "blue")) +
-  geom_bar(stat = "identity") +
-  geom_text(aes(label = count), hjust = -0.25)+
-  coord_flip() + 
-  scale_fill_viridis_d() + theme(
-    axis.text.x = element_blank(),
-    axis.ticks = element_blank()) +
-  labs(title="Reasons for Stops",
-        x ="Count", y = "Stop Reason") 
+p <- ggbarplot(df, x = "stopped.bc", y = "count",
+          rotate=TRUE,
+          fill = "group",      
+          color = "white",          
+          palette = "viridis",           
+          sort.by.groups = TRUE,     
+          sort.val = "asc",          
+          x.text.angle = 60,          
+          legend = "right", legend.title = "Stop Reason"
+)
+p
+
+###########
+# additional reason
+###########
+
+# count stop reasons
+df <- sqf %>%
+  group_by(additional) %>%
+  summarise(count = n())
+
+# remove NAs
+df <- na.omit(df)
+
+# for sorting bug in ggbarplot
+df <- df[order(df$count),]
+df$group <- c(1:10)
+df$group <- factor(df$group)
+
+p <- ggbarplot(df, x = "additional", y = "count",
+               rotate=TRUE,
+               fill = "group",      
+               color = "white",          
+               #palette = "Set1",           
+               sort.by.groups = TRUE,     
+               sort.val = "asc",          
+               x.text.angle = 60,          
+               legend = "right", legend.title = "Stop Reason"
+)
+p
 
 ################
+# suspect sex
+################
 
-gde_15 <- readOGR("/Users/mr4909/csgjc/sqf/nyc_map/nyc.shp")
+# count suspect sex
+df <- sqf %>%
+  group_by(suspect.sex) %>%
+  summarise(count = n())
