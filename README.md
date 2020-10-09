@@ -1,5 +1,6 @@
 # Stop, Question, and Frisk
 
+Examine all complete cases of suspicion of a “criminal possession of weapon” (CPW), and predict the probability that a weapon will be found.  
 
 # Repository Structure 
 
