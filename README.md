@@ -3,8 +3,10 @@
 
 # Repository Structure 
 
-`sqf__import.R`: Imports, combines, cleans, and standardizes all years, and writes out one csv file stop-and-frisk csv data for years 2008-2016.  
+`sqf_analysis.R`: Builds found.weapon classifier with logistic regression, generates calibration plots.  
+`sqf_import.R`: Imports, combines, cleans, and standardizes all years, and writes out one csv file stop-and-frisk csv data for years 2008-2016.  
 `sqf_library.R`: Runs packages and custom functions needed in `sqf__import.R`.  
+`sqf_plots.R`: Creates data visualizations.    
 
 # Data
 
