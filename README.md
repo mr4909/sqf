@@ -12,9 +12,9 @@
 
 [SQF Data](https://www1.nyc.gov/site/nypd/stats/reports-analysis/stopfrisk.page)
 
-`arrest.offenses.tsv`: List of arrestable offenses and their digit codes; provided by provided by Dr. Ravi Shroff (NYU). 
+`arrest.offenses.tsv`: List of arrestable offenses and their digit codes.  
 
-`offense-codes.tsv`: List of offenses and their digit codes; provided by Dr. Ravi Shroff (NYU). 
+`offense-codes.tsv`: List of offenses and their digit codes.   
 
 
 
